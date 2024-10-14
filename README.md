@@ -1,1 +1,1 @@
-# Global-Talk
+# Global Talk
