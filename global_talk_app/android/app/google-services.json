@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1067162591149",
+    "project_id": "global-talk-a199b",
+    "storage_bucket": "global-talk-a199b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1067162591149:android:1272c34acc73c21418cb24",
+        "android_client_info": {
+          "package_name": "com.example.global_talk_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBG8NwSKR6m-BMny7HMqIkcrlnt2clrmck"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
