@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:global_talk_app/screens/signinOrSignUp/signin.dart';
+import 'package:global_talk_app/screens/signinOrSignUp/signup.dart';
 
 import '../../components/primary_button.dart';
 import '../../constants.dart';
@@ -16,19 +18,21 @@ class SigninOrSignupScreen extends StatelessWidget {
           child: Column(
             children: [
               const Spacer(flex: 2),
-              Image.asset(
+          Center(
+            child: Image.asset(
                 MediaQuery.of(context).platformBrightness == Brightness.light
-                    ? "assets/images/Logo_light.png"
-                    : "assets/images/Logo_dark.png",
-                height: 146,
+                    ? "assets/images/global.png"
+                    : "assets/images/global1.png",
+                height: 246,
               ),
+          ),
               const Spacer(),
               PrimaryButton(
                 text: "Sign In",
                 press: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ChatsScreen(),
+                    builder: (context) => const SignInScreen(),
                   ),
                 ),
               ),
@@ -36,7 +40,12 @@ class SigninOrSignupScreen extends StatelessWidget {
               PrimaryButton(
                 color: Theme.of(context).colorScheme.secondary,
                 text: "Sign Up",
-                press: () {},
+                press: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SignUpScreen(),
+                  ),
+                ),
               ),
               const Spacer(flex: 2),
             ],

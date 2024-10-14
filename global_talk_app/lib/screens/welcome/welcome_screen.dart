@@ -15,7 +15,7 @@ class WelcomeScreen extends StatelessWidget {
             Image.asset("assets/images/welcome_image.png"),
             const Spacer(flex: 3),
             Text(
-              "Welcome to our freedom \nmessaging app",
+              "Welcome to our Global Talk \nmessaging app",
               textAlign: TextAlign.center,
               style: Theme.of(context)
                   .textTheme
@@ -24,7 +24,7 @@ class WelcomeScreen extends StatelessWidget {
             ),
             const Spacer(),
             Text(
-              "Freedom talk any person of your \nmother language.",
+              "Global talk any person of any \n language.",
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Theme.of(context)

@@ -1,6 +1,6 @@
-import '../../constants.dart';
 import 'package:flutter/material.dart';
-
+import '../../constants.dart';
+import '../profile/profile_screen.dart'; // Import ProfileScreen
 import 'components/body.dart';
 
 class ChatsScreen extends StatefulWidget {
@@ -12,6 +12,7 @@ class ChatsScreen extends StatefulWidget {
 
 class _ChatsScreenState extends State<ChatsScreen> {
   int _selectedIndex = 1;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,12 +37,18 @@ class _ChatsScreenState extends State<ChatsScreen> {
       onTap: (value) {
         setState(() {
           _selectedIndex = value;
+          if (value == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProfileScreen(),
+              ),
+            );
+          }
         });
       },
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.messenger), label: "Chats"),
-        BottomNavigationBarItem(icon: Icon(Icons.people), label: "People"),
-        BottomNavigationBarItem(icon: Icon(Icons.call), label: "Calls"),
         BottomNavigationBarItem(
           icon: CircleAvatar(
             radius: 14,
