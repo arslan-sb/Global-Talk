@@ -20,11 +20,13 @@ class _CustomProfileScreenState extends State<CustomProfileScreen> {
   User? user;
   bool isLoading = true;
   String? profileImageUrl;
+  bool emailVerified = false;
 
   @override
   void initState() {
     super.initState();
     user = FirebaseAuth.instance.currentUser;
+    emailVerified = user?.emailVerified ?? false; // Check if the email is verified
     fetchUserData();
   }
 
@@ -59,6 +61,20 @@ class _CustomProfileScreenState extends State<CustomProfileScreen> {
       });
     }
   }
+  Future<void> sendEmailVerification() async {
+    try {
+      await user!.sendEmailVerification();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Verification email sent')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
+
 
   Future<void> _pickAndUploadImage() async {
     final picker = ImagePicker();
@@ -181,6 +197,7 @@ class _CustomProfileScreenState extends State<CustomProfileScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
+
                 // Email Field (Read-only)
                 TextFormField(
                   initialValue: user?.email ?? '',
@@ -188,6 +205,18 @@ class _CustomProfileScreenState extends State<CustomProfileScreen> {
                   enabled: false,
                 ),
                 const SizedBox(height: 16),
+
+                // Verification button (only show if the email is not verified)
+                if (!emailVerified)
+                  ElevatedButton(
+                    onPressed: () async {
+                      await sendEmailVerification();
+                    },
+                    child: const Text('Verify Email'),
+                  ),
+
+                const SizedBox(height: 16),
+
                 // Username Field
                 TextFormField(
                   controller: _usernameController,
