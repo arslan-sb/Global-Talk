@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:global_talk_app/screens/chats/chats_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
-
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
@@ -14,7 +12,15 @@ class AuthGate extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
+        // Show loading indicator while waiting for auth state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
         if (!snapshot.hasData) {
+          // User is not signed in, show the sign-in screen
           return SignInScreen(
             providers: [
               EmailAuthProvider(),
@@ -55,8 +61,33 @@ class AuthGate extends StatelessWidget {
               );
             },
           );
+        } else {
+          // User is signed in, check if user profile exists
+          final User user = snapshot.data!;
+          return FutureBuilder<DocumentSnapshot>(
+            future: FirebaseFirestore.instance.collection('users').doc(user.uid).get(),
+            builder: (context, userSnapshot) {
+              if (userSnapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
+                // User profile does not exist, create it
+                FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+                  'username': user.email?.split('@')[0] ?? '',
+                  'gender': '',
+                  'language': '',
+                  'email': user.email ?? '',
+                });
+              }
+
+              // User profile exists or has just been created, navigate to ChatsScreen
+              return const ChatsScreen();
+            },
+          );
         }
-        return const ChatsScreen();
       },
     );
   }

@@ -12,7 +12,12 @@
           "package_name": "com.example.global_talk_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1067162591149-v80rcmv25ld62e1854jhr5eht4ol89p0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBG8NwSKR6m-BMny7HMqIkcrlnt2clrmck"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1067162591149-v80rcmv25ld62e1854jhr5eht4ol89p0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1067162591149-ji8kg4grtt4cqat1502c8405uglv2g3u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.globalTalkApp"
+              }
+            }
+          ]
         }
       }
     }

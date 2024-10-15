@@ -1,8 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:global_talk_app/screens/profile/profile_screen.dart'; // Import ProfileScreen
 import '../../constants.dart';
+import '../profile/profile_screen.dart';
 import 'components/body.dart';
 
 class ChatsScreen extends StatefulWidget {
@@ -19,7 +18,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
-      body: _selectedIndex == 0 ? const Body() : Container(), // Show Body() when Chats is selected
+      body: const Body(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: kPrimaryColor,
@@ -39,40 +38,20 @@ class _ChatsScreenState extends State<ChatsScreen> {
       onTap: (value) {
         setState(() {
           _selectedIndex = value;
-
+          // Within your BottomNavigationBar's onTap handler
           if (value == 1) {
-            // Navigate to ProfileScreen when "Profile" tab is tapped
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProfileScreen(
-                  appBar: AppBar(
-                    title: const Text('User Profile'),
-                  ),
-                  actions: [
-                    SignedOutAction((context) {
-                      Navigator.of(context).pop();
-                    })
-                  ],
-                  children: [
-                    const Divider(),
-                    Padding(
-                      padding: const EdgeInsets.all(2),
-                      child: AspectRatio(
-                        aspectRatio: 2,
-                        child: Image.asset('assets/images/global.png'),
-                      ),
-                    ),
-                  ],
-                ),
+                builder: (context) => const CustomProfileScreen(),
               ),
             ).then((_) {
-              // Reset the selected index to 0 (Chats) when returning from ProfileScreen
               setState(() {
                 _selectedIndex = 0;
               });
             });
           }
+
         });
       },
       items: const [
@@ -98,12 +77,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
           icon: const Icon(Icons.search),
           onPressed: () {},
         ),
-        ElevatedButton(
-          onPressed: () async {
-            await FirebaseAuth.instance.signOut();
-          },
-          child: const Text('Sign Out'),
-        ),
+
       ],
     );
   }

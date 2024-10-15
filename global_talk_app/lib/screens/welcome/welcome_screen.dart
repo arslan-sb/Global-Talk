@@ -1,7 +1,5 @@
 import 'package:global_talk_app/screens/signinOrSignUp/auth_gate.dart';
-
 import '../../constants.dart';
-import '../signinOrSignUp/signin_or_signup_screen.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeScreen extends StatelessWidget {
