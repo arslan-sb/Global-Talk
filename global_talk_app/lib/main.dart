@@ -19,7 +19,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Global Talk',
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: true,
+
       theme: lightThemeData(context),
       darkTheme: darkThemeData(context),
       themeMode: ThemeMode.light,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:global_talk_app/screens/signinOrSignUp/signin.dart';
 import '../../components/primary_button.dart';
 import '../../constants.dart';
+import 'edit_profile.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -18,28 +19,39 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage("assets/images/user_2.png"),
-            ),
-            const SizedBox(height: kDefaultPadding),
-            Text(
-              "User Name",
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall!
-                  .copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: kDefaultPadding / 2),
-            Text(
-              "Email: user@example.com",
-              style: Theme.of(context).textTheme.bodyLarge,
+            Center(
+              child: Column(
+                children: [
+                  const CircleAvatar(
+                    radius: 50,
+                    backgroundImage: AssetImage("assets/images/user_2.png"),
+                  ),
+                  const SizedBox(height: kDefaultPadding),
+                  Text(
+                    "User Name",
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall!
+                        .copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: kDefaultPadding / 2),
+                  Text(
+                    "Email: user@example.com",
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: kDefaultPadding),
             PrimaryButton(
               text: "Edit Profile",
               press: () {
-                // Handle edit profile action
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const EditProfileScreen(),
+                  ),
+                );
               },
             ),
             const SizedBox(height: kDefaultPadding / 2),
@@ -59,3 +71,5 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
+
+
