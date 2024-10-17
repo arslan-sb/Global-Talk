@@ -4,6 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io'; // For File
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
+
 class CustomProfileScreen extends StatefulWidget {
   const CustomProfileScreen({Key? key}) : super(key: key);
 
@@ -49,18 +52,28 @@ class _CustomProfileScreenState extends State<CustomProfileScreen> {
     }
   }
 
-
-
   Future<void> updateUserData() async {
     if (user != null) {
+      // Update Firestore user document
       await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
         'username': _usernameController.text.trim(),
         'gender': _genderController.text.trim(),
         'language': _languageController.text.trim(),
         'profileImageUrl': profileImageUrl ?? '',
       });
+
+      // Update user in Firebase Chat Core
+      await FirebaseChatCore.instance.createUserInFirestore(
+        types.User(
+          firstName: _usernameController.text.trim(), // Assuming first name is username
+          id: user!.uid,
+          imageUrl: profileImageUrl ?? 'https://i.pravatar.cc/300', // Default image if not provided
+          lastName: '', // You can add last name field if you have it in your user model
+        ),
+      );
     }
   }
+
   Future<void> sendEmailVerification() async {
     try {
       await user!.sendEmailVerification();
@@ -73,8 +86,6 @@ class _CustomProfileScreenState extends State<CustomProfileScreen> {
       );
     }
   }
-
-
 
   Future<void> _pickAndUploadImage() async {
     final picker = ImagePicker();
@@ -127,7 +138,6 @@ class _CustomProfileScreenState extends State<CustomProfileScreen> {
       );
     }
   }
-
 
   @override
   void dispose() {
@@ -233,11 +243,12 @@ class _CustomProfileScreenState extends State<CustomProfileScreen> {
                 DropdownButtonFormField<String>(
                   value: _genderController.text.isNotEmpty ? _genderController.text : null,
                   decoration: const InputDecoration(labelText: 'Gender'),
-                  items: const [
-                    DropdownMenuItem(value: 'Male', child: Text('Male')),
-                    DropdownMenuItem(value: 'Female', child: Text('Female')),
-                    DropdownMenuItem(value: 'Other', child: Text('Other')),
-                  ],
+                  items: ['Male', 'Female', 'Other']
+                      .map((gender) => DropdownMenuItem(
+                    value: gender,
+                    child: Text(gender),
+                  ))
+                      .toList(),
                   onChanged: (value) {
                     setState(() {
                       _genderController.text = value ?? '';
@@ -251,32 +262,24 @@ class _CustomProfileScreenState extends State<CustomProfileScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                // Language Field (Dropdown)
-                DropdownButtonFormField<String>(
-                  value: _languageController.text.isNotEmpty ? _languageController.text : null,
+
+                // Language Field
+                TextFormField(
+                  controller: _languageController,
                   decoration: const InputDecoration(labelText: 'Language'),
-                  items: [
-                    DropdownMenuItem(value: 'English', child: Text('English')),
-                    DropdownMenuItem(value: 'Spanish', child: Text('German')),
-                    // DropdownMenuItem(value: 'French', child: Text('French')),
-                    // Add more languages as needed
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      _languageController.text = value ?? '';
-                    });
-                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please select a language';
+                      return 'Please enter a language';
                     }
                     return null;
                   },
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
+
+                // Save button
                 ElevatedButton(
                   onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
+                    if (_formKey.currentState?.validate() == true) {
                       await updateUserData();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Profile updated')),
@@ -284,65 +287,6 @@ class _CustomProfileScreenState extends State<CustomProfileScreen> {
                     }
                   },
                   child: const Text('Save Changes'),
-                ),
-                const SizedBox(height: 16),
-                // Change Password Button
-                ElevatedButton(
-                  onPressed: () async {
-                    if (user?.email != null) {
-                      await FirebaseAuth.instance.sendPasswordResetEmail(email: user!.email!);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Password reset email sent')),
-                      );
-                    }
-                  },
-                  child: const Text('Change Password'),
-                ),
-                const SizedBox(height: 16),
-                // Delete Account Button
-                ElevatedButton(
-                  onPressed: () async {
-                    // Confirm deletion
-                    bool? confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Delete Account'),
-                        content: const Text('Are you sure you want to delete your account? This action cannot be undone.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            child: const Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(true),
-                            child: const Text('Delete'),
-                          ),
-                        ],
-                      ),
-                    );
-
-                    if (confirm == true && user != null) {
-                      try {
-                        // Delete user data from Firestore
-                        await FirebaseFirestore.instance.collection('users').doc(user!.uid).delete();
-
-                        // Delete user account
-                        await user!.delete();
-
-                        Navigator.of(context).popUntil((route) => route.isFirst);
-                      } catch (e) {
-                        // Handle errors, may need to re-authenticate
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Failed to delete account: $e')),
-                        );
-                      }
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-
-                    backgroundColor: Colors.red,
-                  ),
-                  child: const Text('Delete Account'),
                 ),
               ],
             ),

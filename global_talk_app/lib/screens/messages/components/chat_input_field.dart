@@ -1,11 +1,119 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:record/record.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../../constants.dart';
 
-class ChatInputField extends StatelessWidget {
-  const ChatInputField({
-    super.key,
-  });
+class ChatInputField extends StatefulWidget {
+  final types.Room room;
+
+  const ChatInputField({super.key, required this.room});
+
+  @override
+  _ChatInputFieldState createState() => _ChatInputFieldState();
+}
+
+class _ChatInputFieldState extends State<ChatInputField> {
+  final TextEditingController _controller = TextEditingController();
+  final AudioRecorder _recorder = AudioRecorder();
+  bool _isRecording = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _requestPermissions(); // Request permissions when the widget is initialized
+  }
+
+  Future<void> _requestPermissions() async {
+    await [
+      Permission.microphone,
+      Permission.storage,
+    ].request();
+  }
+
+  Future<void> _sendMessage(BuildContext context) async {
+    if (_controller.text.isNotEmpty) {
+      final message = types.PartialText(text: _controller.text);
+
+      // Send the message using Firebase Chat Core
+      FirebaseChatCore.instance.sendMessage(message, widget.room.id);
+      _controller.clear();
+    }
+  }
+
+  Future<void> _sendVoiceMessage() async {
+    if (_isRecording) {
+      final path = await _recorder.stop();
+      if (path != null) {
+        final File audioFile = File(path);
+
+        if (await audioFile.exists()) {
+          print('Audio file exists at: ${audioFile.path}');
+          final message = types.PartialFile(
+            name: 'voice_message.m4a',
+            size: await audioFile.length(),
+            uri: audioFile.uri.toString(),
+          );
+
+          // Send the message automatically
+          try {
+            FirebaseChatCore.instance.sendMessage(message, widget.room.id);
+            print('Voice message sent successfully.');
+          } catch (e) {
+            print('Error sending voice message: $e');
+          }
+        } else {
+          print('Audio file does not exist at: ${audioFile.path}');
+        }
+      } else {
+        print('Recording stopped without a valid path.');
+      }
+      setState(() {
+        _isRecording = false;
+      });
+    } else {
+      final directory = await getApplicationDocumentsDirectory();
+      await _recorder.start(
+        const RecordConfig(),
+        path: '${directory.path}/voice_message.m4a',
+      );
+      setState(() {
+        _isRecording = true;
+      });
+    }
+  }
+
+  Future<void> _sendPdfFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null) {
+      final path = result.files.single.path;
+      if (path != null) {
+        final File pdfFile = File(path);
+
+        final message = types.PartialFile(
+          name: result.files.single.name,
+          size: pdfFile.lengthSync(),
+          uri: pdfFile.uri.toString(),
+        );
+        FirebaseChatCore.instance.sendMessage(message, widget.room.id);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _recorder.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,72 +122,33 @@ class ChatInputField extends StatelessWidget {
         horizontal: kDefaultPadding,
         vertical: kDefaultPadding / 2,
       ),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        boxShadow: [
-          BoxShadow(
-            offset: const Offset(0, 4),
-            blurRadius: 32,
-            color: const Color(0xFF087949).withOpacity(0.08),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Row(
-          children: [
-            const Icon(Icons.mic, color: kPrimaryColor),
-            const SizedBox(width: kDefaultPadding),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: kDefaultPadding * 0.75,
-                ),
-                decoration: BoxDecoration(
-                  color: kPrimaryColor.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(40),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.sentiment_satisfied_alt_outlined,
-                      color: Theme.of(context)
-                          .textTheme
-                          .bodyLarge!
-                          .color!
-                          .withOpacity(0.64),
-                    ),
-                    const SizedBox(width: kDefaultPadding / 4),
-                    const Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: "Type message",
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                    Icon(
-                      Icons.attach_file,
-                      color: Theme.of(context)
-                          .textTheme
-                          .bodyLarge!
-                          .color!
-                          .withOpacity(0.64),
-                    ),
-                    const SizedBox(width: kDefaultPadding / 4),
-                    Icon(
-                      Icons.camera_alt_outlined,
-                      color: Theme.of(context)
-                          .textTheme
-                          .bodyLarge!
-                          .color!
-                          .withOpacity(0.64),
-                    ),
-                  ],
-                ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              decoration: const InputDecoration(
+                hintText: "Type your message...",
+                border: InputBorder.none,
               ),
             ),
-          ],
-        ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.send, color: kPrimaryColor),
+            onPressed: () => _sendMessage(context),
+          ),
+          IconButton(
+            icon: Icon(
+              _isRecording ? Icons.stop : Icons.mic,
+              color: kPrimaryColor,
+            ),
+            onPressed: _sendVoiceMessage,
+          ),
+          IconButton(
+            icon: const Icon(Icons.attach_file, color: kPrimaryColor),
+            onPressed: _sendPdfFile,
+          ),
+        ],
       ),
     );
   }

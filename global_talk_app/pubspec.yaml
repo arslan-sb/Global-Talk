@@ -45,7 +45,11 @@ dependencies:
   firebase_ui_auth: ^1.4.3
   image_picker: ^0.8.9
   permission_handler: ^10.4.3
-
+  flutter_firebase_chat_core: ^1.6.7
+  path_provider: ^2.0.4
+  pdf: ^3.11.1
+  record: ^5.1.2
+  file_picker: ^8.1.2
 
 dev_dependencies:
   flutter_test:

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-
-import '../../constants.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'components/body.dart';
 
 class MessagesScreen extends StatelessWidget {
-  const MessagesScreen({super.key});
+  final types.Room room;
+
+  const MessagesScreen({super.key, required this.room});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
-      body: const Body(),
+      body: Body(room: room), // Pass the room to Body
     );
   }
 
@@ -23,16 +25,16 @@ class MessagesScreen extends StatelessWidget {
           CircleAvatar(
             backgroundImage: AssetImage("assets/images/user_2.png"),
           ),
-          SizedBox(width: kDefaultPadding * 0.75),
+          SizedBox(width: 10), // Adjusted size
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Kristin Watson",
+                "Chat Room", // You can replace this with dynamic room/user names
                 style: TextStyle(fontSize: 16),
               ),
               Text(
-                "Active 3m ago",
+                "Active now", // Dynamic status can be handled
                 style: TextStyle(fontSize: 12),
               )
             ],
@@ -40,15 +42,7 @@ class MessagesScreen extends StatelessWidget {
         ],
       ),
       actions: [
-        // IconButton(
-        //   icon: const Icon(Icons.local_phone),
-        //   onPressed: () {},
-        // ),
-        // IconButton(
-        //   icon: const Icon(Icons.videocam),
-        //   onPressed: () {},
-        // ),
-        const SizedBox(width: kDefaultPadding / 2),
+        const SizedBox(width: 10),
       ],
     );
   }

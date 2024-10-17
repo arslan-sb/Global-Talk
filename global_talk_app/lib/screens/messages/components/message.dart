@@ -1,86 +1,93 @@
-import '../../../models/chat_message.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import '../../../constants.dart';
-import 'audio_message.dart';
-import 'text_message.dart';
-import 'video_message.dart';
 
 class Message extends StatelessWidget {
-  const Message({
-    super.key,
-    required this.message,
-  });
+  final types.Message message;
 
-  final ChatMessage message;
+  const Message({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
-    Widget messageContaint(ChatMessage message) {
-      switch (message.messageType) {
-        case ChatMessageType.text:
-          return TextMessage(message: message);
-        case ChatMessageType.audio:
-          return AudioMessage(message: message);
-        case ChatMessageType.video:
-          return const VideoMessage();
-        default:
-          return const SizedBox();
-      }
+    // Handle text message
+    if (message is types.TextMessage) {
+      return _buildTextMessage(message as types.TextMessage);
     }
 
+    // Handle image message
+    if (message is types.ImageMessage) {
+      return _buildImageMessage(message as types.ImageMessage);
+    }
+
+    // Handle other message types
+    // Add more cases for audio, video, etc., as needed
+    return const SizedBox.shrink(); // Placeholder for unhandled message types
+  }
+
+  Widget _buildTextMessage(types.TextMessage message) {
     return Padding(
-      padding: const EdgeInsets.only(top: kDefaultPadding),
+      padding: const EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
       child: Row(
-        mainAxisAlignment:
-            message.isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: message.author.id == FirebaseChatCore.instance.firebaseUser?.uid
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         children: [
-          if (!message.isSender) ...[
+          if (message.author.id != FirebaseChatCore.instance.firebaseUser?.uid)
             const CircleAvatar(
+              backgroundImage: AssetImage("assets/images/user.png"),
               radius: 12,
-              backgroundImage: AssetImage("assets/images/user_2.png"),
             ),
-            const SizedBox(width: kDefaultPadding / 2),
-          ],
-          messageContaint(message),
-          if (message.isSender) MessageStatusDot(status: message.messageStatus)
+          const SizedBox(width: kDefaultPadding / 2),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: kDefaultPadding * 0.75,
+              vertical: kDefaultPadding / 2,
+            ),
+            decoration: BoxDecoration(
+              color: message.author.id == FirebaseChatCore.instance.firebaseUser?.uid
+                  ? kPrimaryColor
+                  : kPrimaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Text(
+              message.text,
+              style: TextStyle(
+                color: message.author.id == FirebaseChatCore.instance.firebaseUser?.uid
+                    ? Colors.white
+                    : Colors.blueAccent,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
-}
 
-class MessageStatusDot extends StatelessWidget {
-  final MessageStatus? status;
-
-  const MessageStatusDot({super.key, this.status});
-  @override
-  Widget build(BuildContext context) {
-    Color dotColor(MessageStatus status) {
-      switch (status) {
-        case MessageStatus.notSent:
-          return kErrorColor;
-        case MessageStatus.notView:
-          return Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.1);
-        case MessageStatus.viewed:
-          return kPrimaryColor;
-        default:
-          return Colors.transparent;
-      }
-    }
-
-    return Container(
-      margin: const EdgeInsets.only(left: kDefaultPadding / 2),
-      height: 12,
-      width: 12,
-      decoration: BoxDecoration(
-        color: dotColor(status!),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        status == MessageStatus.notSent ? Icons.close : Icons.done,
-        size: 8,
-        color: Theme.of(context).scaffoldBackgroundColor,
+  Widget _buildImageMessage(types.ImageMessage message) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
+      child: Row(
+        mainAxisAlignment: message.author.id == FirebaseChatCore.instance.firebaseUser?.uid
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
+        children: [
+          if (message.author.id != FirebaseChatCore.instance.firebaseUser?.uid)
+            const CircleAvatar(
+              backgroundImage: AssetImage("assets/images/user.png"),
+              radius: 12,
+            ),
+          const SizedBox(width: kDefaultPadding / 2),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: Image.network(
+              message.uri,
+              width: 200,
+              height: 200,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ],
       ),
     );
   }

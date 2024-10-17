@@ -51,7 +51,6 @@ class _ChatsScreenState extends State<ChatsScreen> {
               });
             });
           }
-
         });
       },
       items: const [
@@ -77,7 +76,6 @@ class _ChatsScreenState extends State<ChatsScreen> {
           icon: const Icon(Icons.search),
           onPressed: () {},
         ),
-
       ],
     );
   }
