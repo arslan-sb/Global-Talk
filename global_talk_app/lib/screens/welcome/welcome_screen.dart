@@ -9,10 +9,10 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<User?>(
-      future: _checkUserStatus(), // Call the method to check user status
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(), // Listen for auth changes
       builder: (context, snapshot) {
-        // While checking for authentication status, show a loading screen
+        // While waiting for the authentication state, show a loading screen
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
@@ -28,11 +28,6 @@ class WelcomeScreen extends StatelessWidget {
         return _buildWelcomeScreen(context);
       },
     );
-  }
-
-  // Method to check if the user is already signed in
-  Future<User?> _checkUserStatus() async {
-    return FirebaseAuth.instance.currentUser;
   }
 
   // Method to build the actual WelcomeScreen UI
@@ -104,3 +99,6 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 }
+
+
+

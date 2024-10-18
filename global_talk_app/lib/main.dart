@@ -24,13 +24,11 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This is the free verstion of Flutter Chat App UI Kit
-  // Full code: https://www.patreon.com/posts/chat-app-ui-for-93094811
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Global Talk',
-      debugShowCheckedModeBanner: true,
+      debugShowCheckedModeBanner: false,
 
       theme: lightThemeData(context),
       darkTheme: darkThemeData(context),

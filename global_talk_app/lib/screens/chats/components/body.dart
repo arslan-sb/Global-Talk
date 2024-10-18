@@ -57,7 +57,8 @@ class Body extends StatelessWidget {
                       name: user.firstName ?? 'Unknown',
                       lastMessage: '', // Optionally, you can add logic to show the last message
                       time: '', // Add time formatting if available
-                      image:  'assets/images/user_2.png',
+
+                      image:  user.imageUrl ?? 'assets/images/user_3.png',
                       isActive: true ?? false,
                     ),
                     press: () => _handlePressed(user, context), // Call the new method here

@@ -16,9 +16,9 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:label="global_talk_app"
+        android:label="Global Talk"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/global_talks"
         android:enableOnBackInvokedCallback="true">
 
         <activity
