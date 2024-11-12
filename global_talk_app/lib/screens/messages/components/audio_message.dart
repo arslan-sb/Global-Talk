@@ -185,6 +185,7 @@ class AudioMessage extends StatelessWidget {
           },
           onPlaying: () {
             // Handle playing event
+
             print("Audio is playing");
           },
           onError: (err) {

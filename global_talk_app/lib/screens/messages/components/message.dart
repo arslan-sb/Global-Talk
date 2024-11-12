@@ -99,6 +99,7 @@ class Message extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildAudioMessage(types.FileMessage message) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
@@ -123,6 +124,7 @@ class Message extends StatelessWidget {
                   : Colors.green.withOpacity(0.1), // Custom colors for the bubble
               borderRadius: BorderRadius.circular(30),
             ),
+
             child: AudioMessage(message: message,
               colors: message.author.id == FirebaseChatCore.instance.firebaseUser?.uid
                   ? Colors.green

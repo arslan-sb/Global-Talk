@@ -1,0 +1,11 @@
+sentencepiece
+fastapi
+uvicorn
+pydantic
+aiofiles
+python-multipart
+gtts==2.3.1
+transformers
+huggingface-hub
+whisper
+torch
