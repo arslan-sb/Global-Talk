@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../constants.dart';
 import 'audio_message.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:dio/dio.dart';
 
 class Message extends StatelessWidget {
   final types.Message message;
@@ -22,8 +26,17 @@ class Message extends StatelessWidget {
     }
     else if (message is types.FileMessage ) {
       // Check if it's an audio file (you can use metadata to ensure it's an audio file)
-      return _buildAudioMessage(message as types.FileMessage);
+      // return _buildAudioMessage(message as types.FileMessage); correct
       // return AudioMessage(message: message as types.FileMessage);
+
+      final fileMessage = message as types.FileMessage;
+      // Check if the file is a PDF
+      if (fileMessage.name.endsWith('.pdf')) {
+        return _buildPdfMessage(fileMessage);
+      } else {
+        return _buildAudioMessage(fileMessage);
+      }
+
     }
 
     // Handle other message types
@@ -127,6 +140,73 @@ class Message extends StatelessWidget {
               colors: message.author.id == FirebaseChatCore.instance.firebaseUser?.uid
                   ? Colors.green
                   : Colors.blueAccent ,), // AudioMessage widget
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> downloadAndOpenPdf(String url, String fileName) async {
+    try {
+      // Get application documents directory
+      final directory = await getApplicationDocumentsDirectory();
+      final filePath = '${directory.path}/$fileName';
+
+      // Download PDF file
+      final response = await Dio().download(url, filePath);
+      print("downloaded");
+      if (response.statusCode == 200) {
+        // Open the file with an external PDF viewer
+        await OpenFilex.open(filePath);
+      } else {
+        print('Failed to download PDF');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Widget _buildPdfMessage(types.FileMessage message) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
+      child: Row(
+        mainAxisAlignment: message.author.id == FirebaseChatCore.instance.firebaseUser?.uid
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
+        children: [
+          if (message.author.id != FirebaseChatCore.instance.firebaseUser?.uid)
+            CircleAvatar(
+              backgroundImage: message.author.imageUrl != null && message.author.imageUrl!.isNotEmpty
+                  ? NetworkImage(message.author.imageUrl!)
+                  : const AssetImage("assets/images/user_2.png") as ImageProvider,
+              radius: 12,
+            ),
+          const SizedBox(width: kDefaultPadding / 2),
+          GestureDetector(
+            onTap: () async {
+              downloadAndOpenPdf("https://s28.q4cdn.com/392171258/files/doc_downloads/test.pdf", "sample.pdf");
+
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: kDefaultPadding * 0.75,
+                vertical: kDefaultPadding / 2,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.picture_as_pdf, color: Colors.blue),
+                  const SizedBox(width: 8),
+                  Text(
+                    message.name,
+                    style: const TextStyle(color: Colors.blue),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
