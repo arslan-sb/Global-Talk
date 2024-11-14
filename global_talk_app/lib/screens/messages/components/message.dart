@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
@@ -184,6 +186,7 @@ class Message extends StatelessWidget {
           const SizedBox(width: kDefaultPadding / 2),
           GestureDetector(
             onTap: () async {
+              // Moeez needs to replace this with message.uri from database after he has implemented it corectly
               downloadAndOpenPdf("https://s28.q4cdn.com/392171258/files/doc_downloads/test.pdf", "sample.pdf");
 
             },
@@ -201,7 +204,7 @@ class Message extends StatelessWidget {
                   Icon(Icons.picture_as_pdf, color: Colors.blue),
                   const SizedBox(width: 8),
                   Text(
-                    message.name,
+                    message.name.length>20? message.name.substring(0,20):message.name,
                     style: const TextStyle(color: Colors.blue),
                   ),
                 ],
