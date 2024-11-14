@@ -94,7 +94,8 @@ class MessagesScreen extends StatelessWidget {
               ),
               Text(
                 otherUser.updatedAt != null
-                    ? "Last seen at ${_formatUpdatedAt(otherUser.updatedAt!)}"
+                    ? "Last seen at ${DateFormat('MM/dd/yyyy, hh:mm a').format(DateTime.fromMillisecondsSinceEpoch(otherUser.updatedAt!))} UTC"
+                    // ? "Last seen at ${_formatUpdatedAt(otherUser.updatedAt!)}"
                     : "Unknown",
                 style: const TextStyle(fontSize: 12),
               )
