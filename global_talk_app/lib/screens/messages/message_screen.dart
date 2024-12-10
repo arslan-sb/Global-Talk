@@ -111,6 +111,7 @@ class MessagesScreen extends StatelessWidget {
   String _formatUpdatedAt(int updatedAt) {
     // Initialize timezones
     tz.initializeTimeZones();
+    //Welcome image, Datetime and PDF implemented.
 
     // Get the Pakistan timezone
     final pakistan = tz.getLocation('Asia/Karachi');
