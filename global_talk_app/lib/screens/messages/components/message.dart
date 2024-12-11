@@ -109,11 +109,11 @@ class Message extends StatelessWidget {
     var messageText = result['message'];
     print("geo");
     // Check if translation is needed
-    if (language != user_language && language == "English" && message.author.id != FirebaseChatCore.instance.firebaseUser?.uid ) {
+    if (language != user_language && message.author.id != FirebaseChatCore.instance.firebaseUser?.uid ) {
       print("geo1");
       // Use FutureBuilder to handle translation asynchronously
       return FutureBuilder<String>(
-        future: translateText(messageText!),
+        future: translateText(messageText!, language),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -413,7 +413,8 @@ class Message extends StatelessWidget {
     };
   }
 
-  Future<String> translateText(String text) async {
+  Future<String> translateText(String text, language) async {
+    if(language=="English"){
     final url = Uri.parse('https://api.shoaibaziz.online/english-to-german-text/');
 
     try {
@@ -438,6 +439,35 @@ class Message extends StatelessWidget {
       print('Error: $e');
       return text; // Fallback to original text if translation fails
     }
+    }
+    else if(language=="German"){
+      final url = Uri.parse('https://api.shoaibaziz.online/german-to-english-text/');
+
+      try {
+        final response = await http.post(
+          url,
+          headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: {
+            'text': text,
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final responseData = jsonDecode(response.body);
+          return responseData['english_sentence']; // Adjust key based on API response
+        } else {
+          throw Exception('Failed to translate. Status code: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('Error: $e');
+        return text; // Fallback to original text if translation fails
+      }
+    }
+    return text;
+
   }
 
 
