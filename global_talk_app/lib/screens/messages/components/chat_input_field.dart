@@ -53,10 +53,10 @@ class _ChatInputFieldState extends State<ChatInputField> {
 
   Future<void> _sendMessage(BuildContext context) async {
     if (_controller.text.isNotEmpty) {
-      final message = types.PartialText(text: _controller.text);
+      final message = types.PartialText(text: _controller.text + "///$user_language");
 
       // Send the message using Firebase Chat Core
-      FirebaseChatCore.instance.sendMessage(message, widget.room.id);
+      FirebaseChatCore.instance.sendMessage(message  , widget.room.id);
       _controller.clear();
     }
   }
@@ -150,23 +150,79 @@ class _ChatInputFieldState extends State<ChatInputField> {
   Future<void> _sendPdfFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf'],
+      allowedExtensions: ['pdf'], // Restrict file picker to PDF files
     );
 
     if (result != null) {
-      final path = result.files.single.path;
+      final path = result.files.single.path; // Get the selected file path
       if (path != null) {
         final File pdfFile = File(path);
 
-        final message = types.PartialFile(
-          name: result.files.single.name,
-          size: pdfFile.lengthSync(),
-          uri: pdfFile.uri.toString(),
+        // Create a reference in Firebase Storage for the PDF
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('pdf_files')
+            .child('${DateTime.now().millisecondsSinceEpoch}_${result.files.single.name}');
+
+        final metadata = SettableMetadata(
+          contentType: 'application/pdf', // Set appropriate content type
         );
-        FirebaseChatCore.instance.sendMessage(message, widget.room.id);
+
+        try {
+          // Upload the PDF file to Firebase Storage
+          await storageRef.putFile(pdfFile, metadata);
+
+          // Get the download URL for the uploaded PDF
+          final pdfUrl = await storageRef.getDownloadURL();
+
+          // Create a message with the PDF file information
+          final message = types.PartialFile(
+            name: result.files.single.name, // File name
+            size: pdfFile.lengthSync(), // File size
+            uri: pdfUrl, // Download URL
+            metadata: {
+              'type': 'pdf', // Custom metadata (optional)
+            },
+          );
+
+          // Send the message
+          FirebaseChatCore.instance.sendMessage(message, widget.room.id);
+
+          // Optional: Show a success message
+          print('PDF sent successfully!');
+        } catch (e) {
+          // Handle upload or send errors
+          print('Error uploading or sending PDF: $e');
+        }
+      } else {
+        print('No file path found.');
       }
+    } else {
+      print('File selection canceled.');
     }
   }
+
+
+  // Future<void> _sendPdfFile() async {
+  //   final result = await FilePicker.platform.pickFiles(
+  //     type: FileType.custom,
+  //     allowedExtensions: ['pdf'],
+  //   );
+  //
+  //   if (result != null) {
+  //     final path = result.files.single.path;
+  //     if (path != null) {
+  //       final File pdfFile = File(path);
+  //
+  //       final message = types.PartialFile(
+  //         name: result.files.single.name,
+  //         size: pdfFile.lengthSync(),
+  //         uri: pdfFile.uri.toString(),
+  //       );
+  //       FirebaseChatCore.instance.sendMessage(message, widget.room.id);
+  //     }
+  //   }
+  // }
 
   @override
   void dispose() {

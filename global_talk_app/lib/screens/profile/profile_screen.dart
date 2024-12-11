@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:global_talk_app/constants.dart';
 import 'dart:io'; // For File
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -48,6 +49,7 @@ class _CustomProfileScreenState extends State<CustomProfileScreen> {
           if (data.containsKey('metadata') && data['metadata'] != null) {
             _genderController.text = data['metadata']['gender'] ?? '';
             _languageController.text = data['metadata']['language'] ?? '';
+            user_language = data['metadata']['language'] ?? '';
           }
 
           profileImageUrl = data['imageUrl'] ?? '';
@@ -282,8 +284,8 @@ class _CustomProfileScreenState extends State<CustomProfileScreen> {
                   decoration: const InputDecoration(labelText: 'Language'),
                   items: [
                     DropdownMenuItem(value: 'English', child: Text('English')),
-                    DropdownMenuItem(value: 'Spanish', child: Text('German')),
-                    // DropdownMenuItem(value: 'French', child: Text('French')),
+                    DropdownMenuItem(value: 'Spanish', child: Text('Spanish')),
+                    DropdownMenuItem(value: 'German', child: Text('German')),
                     // Add more languages as needed
                   ],
                   onChanged: (value) {
