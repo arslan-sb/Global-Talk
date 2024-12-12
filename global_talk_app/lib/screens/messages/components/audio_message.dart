@@ -19,7 +19,7 @@ class AudioMessage extends StatelessWidget {
 // Log the metadata to debug its structure
     print("arslans metadata: ${message.metadata}");
 
-    if (message.metadata != null && message.metadata!["language"] != null && message.author.id != FirebaseChatCore.instance.firebaseUser?.uid) {
+    if (message.metadata != null && message.metadata!["language"] != null ) {
       final language = message.metadata!["language"];
 
       // Handle case where "language" might be a map
