@@ -49,7 +49,7 @@ class _CustomProfileScreenState extends State<CustomProfileScreen> {
           if (data.containsKey('metadata') && data['metadata'] != null) {
             _genderController.text = data['metadata']['gender'] ?? '';
             _languageController.text = data['metadata']['language'] ?? '';
-            user_language = data['metadata']['language'] ?? '';
+            user_language = data['metadata']['language'] ?? 'English';
           }
 
           profileImageUrl = data['imageUrl'] ?? '';

@@ -250,14 +250,15 @@ class Message extends StatelessWidget {
                       : Colors.green.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(30),
                 ),
-                child: AudioMessage(
-                  audioUrl: message.uri,
-                  senderLanguage: senderLanguage,
-                  receiverLanguage: receiverLanguage,
-                  colors: message.author.id == FirebaseChatCore.instance.firebaseUser?.uid
-                      ? Colors.green
-                      : Colors.blueAccent,
-                ),
+                child: AudioMessage(message: message, colors: message.author.id == FirebaseChatCore.instance.firebaseUser?.uid?  Colors.green: Colors.blueAccent),
+                // child: AudioMessage(
+                //   audioUrl: message.uri,
+                //   senderLanguage: senderLanguage,
+                //   receiverLanguage: receiverLanguage,
+                //   colors: message.author.id == FirebaseChatCore.instance.firebaseUser?.uid
+                //       ? Colors.green
+                //       : Colors.blueAccent,
+                // ),
               ),
             ],
           ),
