@@ -107,6 +107,7 @@ class Message extends StatelessWidget {
     Map<String, String> result = extractMessageAndLanguage(message.text);
     var language = result['language'];
     var messageText = result['message'];
+
     print("geo");
     // Check if translation is needed
     if (language != user_language && message.author.id != FirebaseChatCore.instance.firebaseUser?.uid ) {
@@ -415,6 +416,7 @@ class Message extends StatelessWidget {
   }
 
   Future<String> translateText(String text, language) async {
+
     if(language=="English"){
     final url = Uri.parse('https://api.shoaibaziz.online/english-to-german-text/');
 

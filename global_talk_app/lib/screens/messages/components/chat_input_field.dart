@@ -57,7 +57,8 @@ class _ChatInputFieldState extends State<ChatInputField> {
 
   Future<void> _sendMessage(BuildContext context) async {
     if (_controller.text.isNotEmpty) {
-      final message = types.PartialText(text: _controller.text + "///$user_language");
+      final lan = await getUserLanguage(FirebaseChatCore.instance.firebaseUser!.uid);
+      final message = types.PartialText(text: _controller.text + "///$lan");
 
       // Send the message using Firebase Chat Core
       FirebaseChatCore.instance.sendMessage(message  , widget.room.id);
@@ -450,4 +451,6 @@ class _ChatInputFieldState extends State<ChatInputField> {
     );
   }
 }
+
+
 

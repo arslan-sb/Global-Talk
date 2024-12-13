@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:global_talk_app/constants.dart';
 import 'package:global_talk_app/screens/chats/chats_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
@@ -81,11 +82,14 @@ class AuthGate extends StatelessWidget {
                   future: _createUserProfile(user),
                   builder: (context, _) {
                     if (_.connectionState == ConnectionState.waiting) {
+
                       return const Scaffold(
                         body: Center(child: CircularProgressIndicator()),
+
                       );
                     }
                     // After user creation, navigate to the ChatsScreen
+
                     return const ChatsScreen();
                   },
                 );
@@ -118,4 +122,29 @@ class AuthGate extends StatelessWidget {
       ),
     );
   }
+}
+Future<String> getUserLanguage(String userId) async {
+  try {
+    // Fetch the user's document from Firestore
+    final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+    if (doc.exists) {
+      // Check if the 'metadata' field exists and contains the 'language' key
+      final data = doc.data();
+      if (data != null && data.containsKey('metadata') && data['metadata'] != null) {
+
+        final metadata = data['metadata'] as Map<String, dynamic>;
+        print("language: " + data['metadata']  );
+        return metadata['language'] ?? 'English'; // Default to English if not set
+      }
+
+      // Fallback to top-level 'language' key if 'metadata.language' is not present
+      // return data['language'] ?? 'English'; // Default to English if not set
+    }
+  } catch (e) {
+    print('Error fetching user language: $e');
+  }
+
+  // Default to English if something goes wrong
+  return 'English';
 }
